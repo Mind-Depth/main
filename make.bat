@@ -29,7 +29,7 @@ call :clone acquisition rush
 call :clone generation reboot
 call :clone environnement build
 python -m venv %venv%
-%venv%Scripts\pip.exe install pyinstaller ^
+%venv%Scripts\pip.exe install pyinstaller pyqt5ac ^
 	-r generation\requirements.txt ^
 	-r acquisition\MiddleV2\requirements.txt ^
 	-r acquisition\ORengine\requirements.txt
@@ -54,6 +54,15 @@ exit /b 0
 :build_launcher
 set entry=Launcher
 set input=generation\
+set ui="tmp.yml"
+(
+echo ioPaths:
+echo -
+echo ^ - "%input%\qt\\*.qrc"
+echo ^ - "%input%\src\\%%%%FILENAME%%%%_rc.py"
+)>"%ui%"
+%venv%Scripts\pyqt5ac.exe --config %ui%
+del %ui%
 %venv%Scripts\pyinstaller.exe --windowed -y --distpath %output% --workpath %tmp% %input%src\%entry%.py
 if %errorlevel% neq 0 exit /b %errorlevel%
 del %entry%.spec
